@@ -1,13 +1,12 @@
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import Router from 'next/router';
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../config/firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
-import { Layout, Row, Col, Button, Dropdown, message, Space } from "antd";
-import { UserOutlined, DownOutlined } from "@ant-design/icons";
+import { Layout } from "antd";
 import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
-import { LineChart, XAxis, Tooltip, CartesianGrid, Line } from "recharts";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
 
 const firebaseApp = initializeApp(firebaseConfig);
 
@@ -17,10 +16,18 @@ const Country = () => {
     const db = getFirestore(firebaseApp);
 
     const [user, setUser] = useState([]);
-    const [statistics, setStatistics] = useState([]);
+    const [statistics1, setStatistics1] = useState([]);
+    const [statistics2, setStatistics2] = useState([]);
+    const [statistics3, setStatistics3] = useState([]);
 
     const queryParameters = new URLSearchParams(window.location.search);
     const country = queryParameters.get("name");
+
+    const style = {
+        textAlign: 'center',
+    };
+
+    /* RENVOIE A LA PAGE DE CONNEXION SI PAS CONNECTE */
 
     useEffect(() => {
         onAuthStateChanged(auth, async (user) => {
@@ -41,9 +48,49 @@ const Country = () => {
 
     const axios = require("axios");
 
-    const getStatistics = {
+    const separator = '-';
+
+    const date1 = new Date();
+    const day1 = date1.getDate();
+    const month1 = date1.getMonth() + 1;
+    const year1 = date1.getFullYear();
+
+    const date2 = new Date();
+    date2.setDate(date1.getDate() - 1);
+    const day2 = date2.getDate();
+    const month2 = date2.getMonth() + 1;
+    const year2 = date2.getFullYear();
+
+    const date3 = new Date();
+    date3.setDate(date1.getDate() - 2);
+    const day3 = date3.getDate();
+    const month3 = date3.getMonth() + 1;
+    const year3 = date3.getFullYear();
+
+    const getStatistics1 = {
         method: 'GET',
-        url: 'https://covid-193.p.rapidapi.com/statistics?country=' + country,
+        url: 'https://covid-193.p.rapidapi.com/history',
+        params: { country: country, day: `${year1}${separator}${month1 < 10 ? `0${month1}` : `${month1}`}${separator}${day1}` },
+        headers: {
+            'X-RapidAPI-Key': '3a8a15d72emshb7d4d752f9d9694p1a2cedjsne65d58c8694c',
+            'X-RapidAPI-Host': 'covid-193.p.rapidapi.com'
+        }
+    };
+
+    const getStatistics2 = {
+        method: 'GET',
+        url: 'https://covid-193.p.rapidapi.com/history',
+        params: { country: country, day: `${year2}${separator}${month2 < 10 ? `0${month2}` : `${month2}`}${separator}${day2}` },
+        headers: {
+            'X-RapidAPI-Key': '3a8a15d72emshb7d4d752f9d9694p1a2cedjsne65d58c8694c',
+            'X-RapidAPI-Host': 'covid-193.p.rapidapi.com'
+        }
+    };
+
+    const getStatistics3 = {
+        method: 'GET',
+        url: 'https://covid-193.p.rapidapi.com/history',
+        params: { country: country, day: `${year3}${separator}${month3 < 10 ? `0${month3}` : `${month3}`}${separator}${day3}` },
         headers: {
             'X-RapidAPI-Key': '3a8a15d72emshb7d4d752f9d9694p1a2cedjsne65d58c8694c',
             'X-RapidAPI-Host': 'covid-193.p.rapidapi.com'
@@ -53,53 +100,77 @@ const Country = () => {
     /* RECHERCHE DES STATISTIQUES SUR LE PAYS */
 
     useEffect(() => {
-        axios.request(getStatistics).then(function (response) {
+        axios.request(getStatistics1).then(function (response) {
             console.log(response.data.response[0]);
-            setStatistics(response.data.response[0]);
+            setStatistics1(response.data.response[0]);
         }).catch(function (error) {
             console.error(error);
         });
-        return () => setStatistics({});
+        return () => setStatistics1({});
     }, [])
 
-    const { Header, Content } = Layout;
+    useEffect(() => {
+        axios.request(getStatistics2).then(function (response) {
+            console.log(response.data.response[0]);
+            setStatistics2(response.data.response[0]);
+        }).catch(function (error) {
+            console.error(error);
+        });
+        return () => setStatistics2({});
+    }, [])
+
+    useEffect(() => {
+        axios.request(getStatistics3).then(function (response) {
+            console.log(response.data.response[0]);
+            setStatistics3(response.data.response[0]);
+        }).catch(function (error) {
+            console.error(error);
+        });
+        return () => setStatistics3({});
+    }, [])
+
+    /* DONNES DU GRAPHIQUE */
+
+    const data = [
+        { date: statistics3?.day, cas: statistics3?.cases?.active },
+        { date: statistics2?.day, cas: statistics2?.cases?.active },
+        { date: statistics1?.day, cas: statistics1?.cases?.active },
+    ];
+
+    const renderLineChart = (
+        <LineChart width={600} height={300} data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+            <Line type="monotone" dataKey="cas" stroke="#8884d8" />
+            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+        </LineChart>
+    );
+
+    const { Header, Sider, Content } = Layout;
 
     return (
-        <Layout>
+        <Layout class='white'>
             <Header>
                 <Navbar user={user} />
             </Header>
 
-            <Content>
-                <br />
-                <Col class="statistics">
-                    <p>Nom : {statistics?.country}</p>
-                    <p>Continent : {statistics?.continent}</p>
-                    <p>Population : {statistics?.population}</p>
-                    <p>Nouveaux cas covid : {statistics?.new}</p>
-                    <p>Touchés par le covid : {statistics?.active}</p>
-                    <p>Guéris : {statistics?.recovered}</p>
-                    <p>Total : {statistics?.total}</p>
-                </Col>
-                <Row justify="space-between">
-                    <br />
-                    {/* <p>
-                        <LineChart
-                            width={400}
-                            height={400}
-                            data={null}
-                            margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
-                        >
-                            <XAxis dataKey="name" />
-                            <Tooltip />
-                            <CartesianGrid stroke="#f5f5f5" />
-                            <Line type="monotone" dataKey="uv" stroke="#ff7300" yAxisId={0} />
-                            <Line type="monotone" dataKey="pv" stroke="#387908" yAxisId={1} />
-                        </LineChart>
-                    </p> */}
-                    <br />
-                </Row>
-            </Content>
+            <Layout class='white'>
+                <Sider class='centerStatistics'>
+                    <p>Nom : {statistics1?.country}</p>
+                    <p>Continent : {statistics1?.continent}</p>
+                    <p>Population : {statistics1?.population}</p>
+                    <p>Nouveaux cas covid : {statistics1?.cases?.new}</p>
+                    <p>Touchés par le covid : {statistics1?.cases?.active}</p>
+                    <p>Guéris : {statistics1?.cases?.recovered}</p>
+                    <p>Total : {statistics1?.cases?.total}</p>
+                </Sider>
+
+                <Content class='centerStatistics'>
+                    <p style={style}><strong>Nombre de cas sur 3 jours</strong></p>
+                    {renderLineChart}
+                </Content>
+            </Layout>
         </Layout>
     )
 

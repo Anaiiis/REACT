@@ -95,7 +95,7 @@ const Dashboard = () => {
                 <Navbar user={user} />
             </Header>
 
-            <Content class='content'>
+            <Content class='white'>
                 <div class='center'>
                     <input
                         type="search"

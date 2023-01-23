@@ -15,8 +15,16 @@ a {
   box-sizing: border-box;
 }
 
-.content {
+.white{
+  width: 100%;
   background-color: white;
+}
+
+.centerStatistics {
+  margin-top: 30px;
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .center {
