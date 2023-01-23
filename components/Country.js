@@ -20,7 +20,7 @@ const Country = () => {
     const [statistics2, setStatistics2] = useState([]);
     const [statistics3, setStatistics3] = useState([]);
 
-    const queryParameters = new URLSearchParams(window.location.search);
+    const queryParameters = new URLSearchParams(global?.window?.location?.search);
     const country = queryParameters.get("name");
 
     const style = {

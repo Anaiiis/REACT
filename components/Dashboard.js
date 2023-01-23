@@ -109,7 +109,7 @@ const Dashboard = () => {
                 <Card title='Sélectionner un pays'>
                     {foundCountries && foundCountries.length > 0 ? (
                         foundCountries.map((country) => (
-                            <Card.Grid style={gridStyle}>
+                            <Card.Grid key="countryGrid" style={gridStyle}>
                                 <Button key="displayStatistics" type="link" onClick={() => Router.push(
                                     {
                                         pathname: '/country',
