@@ -1,5 +1,5 @@
 {
-  "name": "eseo-react-covid",
+  "name": "my-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,16 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ant-design/icons": "^4.8.0",
-    "antd": "^5.0.6",
+    "@ant-design/icons": "^4.7.0",
+    "antd": "^5.1.2",
+    "axios": "^1.2.2",
     "firebase": "^9.15.0",
-    "next": "13.0.6",
+    "firestore": "^1.1.6",
+    "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-router-dom": "^6.4.5"
+    "react-native": "^0.71.0",
+    "react-router-dom": "^6.4.3",
+    "recharts": "^2.3.2"
   },
   "devDependencies": {
-    "eslint": "8.29.0",
-    "eslint-config-next": "13.0.6"
+    "eslint": "8.26.0",
+    "eslint-config-next": "12.3.1"
   }
 }
